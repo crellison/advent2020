@@ -39,7 +39,7 @@ def count_options(num):
         return 1
     else:
         max_range = 3 if num == 2 else 4
-        return sum([count_options(num - x) for x in range(1,4)])
+        return sum([count_options(num - x) for x in range(1,max_range)])
     
 
 if __name__ == "__main__":
