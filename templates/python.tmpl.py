@@ -1,3 +1,5 @@
+from copy import deepcopy
+from collections import defaultdict
 from os.path import abspath, dirname
 from typing import List
 

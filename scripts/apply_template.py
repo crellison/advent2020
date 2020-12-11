@@ -1,11 +1,17 @@
+#!/usr/bin/python3
+
 from os.path import dirname, abspath, basename, exists
 from os import makedirs
 from sys import argv
+from glob import glob
+from re import match
 
 project_dir=dirname(dirname(abspath(__file__)))
+language, ext = ".*/([a-z]+)\.tmpl.*", ".*\.tmpl\.([a-z]+)$"
 
 templates = {
-    "python": ("py", f"{project_dir}/templates/python.tmpl")
+    match(language, file)[1]: (match(ext, file)[1], file)
+    for file in glob(f"{project_dir}/templates/*.tmpl.*")
 }
 
 def apply_template(language: str, year: str, day: str, detail: str):
@@ -39,7 +45,7 @@ def check_exists(out_file: str):
 def parse_argv():
     [language, year, day, detail] = argv[1:]
     if language not in templates:
-        raise Exception(f"Requested language not supported by templates: {language}")
+        raise Exception(f"Template for {language} not found in: {list(templates.keys())}")
 
     return language, year, day, detail
     
