@@ -23,7 +23,7 @@ def get_first_bus(timestamp, busses):
 
 def bezout_coeff(a, b):
     """Given coprimes a,b: calculates x, y s.t. ax + by = 1.
-    
+
     https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Pseudocode
     """
     old_remainder, remainder = a, b
@@ -53,18 +53,17 @@ def chinese_remainder_theorem(input: List[Tuple[int, int]]) -> int:
         y_mod, y_id = y
         x_bc, y_bc = bezout_coeff(x_id, y_id)
         new_mod = y_bc * y_id * x_mod + x_bc * x_id * y_mod
-        current_product = y_id * x_id
+        product = y_id * x_id
 
         # minimize new modulus to smallest positive option
-        if new_mod < 0:
-            new_mod += ceil(abs(new_mod) / current_product) * current_product
-        else:
-            new_mod -= floor(abs(new_mod) / current_product) * current_product
+        mod_ratio = abs(new_mod) / product
+        new_mod += (ceil(mod_ratio) if new_mod < 0 else -floor(mod_ratio)) * product
 
-        return (new_mod, y_id * x_id)
+        return (new_mod, product)
 
     x, _ = reduce(reducer, input)
     return x
+
 
 if __name__ == "__main__":
     [timestamp, busses] = get_input()
