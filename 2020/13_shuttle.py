@@ -22,7 +22,10 @@ def get_first_bus(timestamp, busses):
 
 
 def bezout_coeff(a, b):
-    """Given coprimes a,b: calculates x, y s.t. ax + by = 1."""
+    """Given coprimes a,b: calculates x, y s.t. ax + by = 1.
+    
+    https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Pseudocode
+    """
     old_remainder, remainder = a, b
     old_a_coeff, a_coeff = 1, 0
     old_b_coeff, b_coeff = 0, 1
@@ -41,6 +44,8 @@ def chinese_remainder_theorem(input: List[Tuple[int, int]]) -> int:
 
     The solution is minimized at each step by the collective product of the
     inputs thus far.
+
+    https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Using_the_existence_construction
     """
 
     def reducer(x: Tuple[int, int], y: Tuple[int, int]) -> Tuple[int, int]:
