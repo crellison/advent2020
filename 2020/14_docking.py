@@ -6,6 +6,7 @@ from typing import List
 
 INPUT_FILE = dirname(abspath(__file__)) + "/inputs/14-1.txt"
 
+
 def get_input() -> List:
     contents = [l.split(" = ") for l in open(INPUT_FILE).read().split("\n") if l != ""]
     return contents
@@ -13,24 +14,28 @@ def get_input() -> List:
 
 memory = defaultdict(int)
 entry_len = 36
+global total_step_count
+total_step_count = 0
+
 
 def write_masked_values_to_memory(input):
-    mask = ''
+    mask = ""
     for arg, value in input:
-        if arg == 'mask':
+        if arg == "mask":
             mask = value
         else:
-            index = match('mem\[([0-9]+)\]', arg).group(1)
+            index = match("mem\[([0-9]+)\]", arg).group(1)
             masked_value = apply_basic_mask(int(value), mask)
             memory[index] = masked_value
 
+
 def write_masked_addresses_to_memory(input):
-    mask = ''
+    mask = ""
     for arg, value in input:
-        if arg == 'mask':
+        if arg == "mask":
             mask = value
         else:
-            index = match('mem\[([0-9]+)\]', arg).group(1)
+            index = match("mem\[([0-9]+)\]", arg).group(1)
             addresses = apply_floating_mask(int(index), mask)
             for address in addresses:
                 memory[address] = int(value)
@@ -54,6 +59,7 @@ def apply_basic_mask(decimal_num: int, mask: str) -> int:
             binary[i] = mask[i]
     return int("0b" + "".join(binary), 2)
 
+
 def apply_floating_mask(decimal_num: int, mask: str) -> List[int]:
     """Applies a 36-bit bitmask to a decimal integer.
 
@@ -69,10 +75,11 @@ def apply_floating_mask(decimal_num: int, mask: str) -> List[int]:
         if mask[i] == "X":
             copied = deepcopy(binary)
             for j in range(len(copied)):
-                copied[j][i] = '0'
-                binary[j][i] = '1'
+                copied[j][i] = "0"
+                binary[j][i] = "1"
             binary.extend(copied)
     return [int("0b" + "".join(bit_array), 2) for bit_array in binary]
+
 
 if __name__ == "__main__":
     input = get_input()

@@ -25,13 +25,17 @@ def get_differences_and_options(input):
             run_of_ones_count = 0
     return differences, options_count
 
+
 def memoize(f: Callable[[Any], Any]) -> Callable[[Any], Any]:
     memo = {}
+
     def helper(x):
-        if x not in memo:            
+        if x not in memo:
             memo[x] = f(x)
         return memo[x]
+
     return helper
+
 
 @memoize
 def count_options(num):
@@ -39,8 +43,8 @@ def count_options(num):
         return 1
     else:
         max_range = 3 if num == 2 else 4
-        return sum([count_options(num - x) for x in range(1,max_range)])
-    
+        return sum([count_options(num - x) for x in range(1, max_range)])
+
 
 if __name__ == "__main__":
     input = get_input()

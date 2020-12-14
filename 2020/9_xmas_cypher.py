@@ -36,6 +36,7 @@ def find_first_invalid(input: List[int]) -> Tuple[int, int]:
                 valid_sums[x][key] = x + key
     raise Exception("unable to find invalid value in cypher")
 
+
 def find_contiguous_sum(input, target_sum):
     low, high, max_index = 0, 1, len(input) - 1
     current_sum = sum(input[low:high])
@@ -50,6 +51,7 @@ def find_contiguous_sum(input, target_sum):
         current_sum = sum(input[low:high])
 
     return input[low:high]
+
 
 if __name__ == "__main__":
     input = get_input()

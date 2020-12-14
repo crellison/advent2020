@@ -19,10 +19,10 @@ def num_trees_hit(trees: list, vert_step: int, right_step: int) -> int:
 
     trees is a list with string lines of the format
     `...............##........##....`
-    
+
     `#` represents a tree and `.` represents an open slope.
-    The tree pattern repeats to the right. 
-    
+    The tree pattern repeats to the right.
+
     Starting at the upper left, this counts how many trees you encounter if you
     traverse down the treed slope.
     """
