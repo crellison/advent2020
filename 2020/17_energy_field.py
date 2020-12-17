@@ -1,6 +1,5 @@
-from copy import deepcopy
-from collections import defaultdict
 from os.path import abspath, dirname
+from typing import Dict, Tuple
 
 INPUT_FILE = dirname(abspath(__file__)) + "/inputs/17-1.txt"
 
@@ -18,18 +17,20 @@ directions_d4 = [
 ]
 
 
-def get_input() -> defaultdict:
+def get_input() -> Dict[Tuple, bool]:
     contents = [list(line) for line in open(INPUT_FILE).read().split("\n") if line != ""]
-    board = defaultdict(bool)
-    for x in range(len(contents)):
-        for y in range(len(contents[x])):
-            if contents[x][y] == "#":
-                board[(x, y, 0, 0)] = True
+    board = {
+        (x, y, 0, 0): True
+        for x in range(len(contents))
+        for y in range(len(contents[x]))
+        if contents[x][y] == "#"
+    }
+
     return board
 
 
-def step_field(field: defaultdict) -> defaultdict:
-    new_field = deepcopy(field)
+def step_field(field: Dict[Tuple, bool]) -> Dict[Tuple, bool]:
+    new_field = dict()
     entries_to_check = set()
     for coord, value in field.items():
         if value:
@@ -41,11 +42,11 @@ def step_field(field: defaultdict) -> defaultdict:
     for entry in entries_to_check:
         x, y, z, w = entry
         occupied_neighbors = sum(
-            field[(x + dx, y + dy, z + dz, w + dw)] for dx, dy, dz, dw in directions_d4
+            (x + dx, y + dy, z + dz, w + dw) in field for dx, dy, dz, dw in directions_d4
         )
-        if field[entry] and occupied_neighbors not in [2, 3]:
-            new_field.pop(entry)
-        elif not field[entry] and occupied_neighbors == 3:
+        if entry in field and occupied_neighbors in [2, 3]:
+            new_field[entry] = True
+        elif entry not in field and occupied_neighbors == 3:
             new_field[entry] = True
     return new_field
 
