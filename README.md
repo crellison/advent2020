@@ -31,11 +31,11 @@ Usage: $ python apply_template.py language year day detail
 |9|python|
 |10|python|
 |11|python|
-|12| |
-|13| |
-|14| |
-|15| |
-|16| |
+|12|python|
+|13|python|
+|14|python|
+|15|python|
+|16|python|
 |17| |
 |18| |
 |19| |
