@@ -26,6 +26,7 @@ def apply_template(language: str, year: str, day: str, detail: str):
     check_exists(out_file)
 
     open(f"{inputs_dir}/{day}-1.txt", mode="w").close()
+    open(f"{inputs_dir}/{day}-test.txt", mode="w").close()
     with open(f"{project_dir}/{out_file}", mode="w") as file:
         file.write(templated_file)
 
