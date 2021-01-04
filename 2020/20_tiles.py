@@ -282,10 +282,12 @@ if __name__ == "__main__":
     monster_count = 0
     for i in range(4):
         tmp_board = rotate_right(complete_board, i)
-        tmp_count = max(count_sea_monsters(tmp_board), count_sea_monsters(flip_tile(tmp_board, True)))
+        tmp_count = max(
+            count_sea_monsters(tmp_board), count_sea_monsters(flip_tile(tmp_board, True))
+        )
         if tmp_count != 0:
             monster_count = tmp_count
 
     hash_count = sum(len(line.replace(".", "")) for line in complete_board)
-    roughness = hash_count - monster_count * 15 # 15 `#` per monster
+    roughness = hash_count - monster_count * 15  # 15 `#` per monster
     print(f"roughness is {roughness} with {monster_count} monsters")

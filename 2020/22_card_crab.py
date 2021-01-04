@@ -61,8 +61,9 @@ def score_deck(deck: List[int]):
 
 
 if __name__ == "__main__":
-    sys.setrecursionlimit(7500)  # oh god no
     simple_score = play_combat(*get_input())
     print(f"combat score: {simple_score}")
+    sys.setrecursionlimit(7500)  # oh god no
     winner, deck = play_recursive_combat(*get_input())
+    sys.setrecursionlimit(1000)
     print(f"recursive combat score: {score_deck(deck)}")
