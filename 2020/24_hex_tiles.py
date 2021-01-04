@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 from os.path import abspath, dirname
-from typing import Dict, List, Tuple
+from typing import Dict, List, Set, Tuple
 
 INPUT_FILE = dirname(abspath(__file__)) + "/inputs/24-1.txt"
 
@@ -34,11 +34,14 @@ def landing_location(path: Dict[str, int]) -> Tuple[float, float]:
     return final_location
 
 
-def flip_tiles(tiles: List[Dict[str, int]]):
-    flipped = defaultdict(bool)
+def flip_tiles(tiles: List[Dict[str, int]]) -> Set[Tuple[float, float]]:
+    flipped = set()
     for tile in tiles:
         final_location = landing_location(tile)
-        flipped[final_location] = not flipped[final_location]
+        if final_location in flipped:
+            flipped.remove(final_location)
+        else:
+            flipped.add(final_location)
     return flipped
 
 
@@ -46,7 +49,7 @@ def get_adjacent(coordinate: Tuple[float, float]) -> List[Tuple[float, float]]:
     return [tuple(sum(x) for x in zip(coordinate, dir_val[1])) for dir_val in dirs.values()]
 
 
-def iterate_tiles(tile_board: Dict[Tuple[float, float], bool]) -> Dict[Tuple[float, float], bool]:
+def iterate_tiles(tile_board: Set[Tuple[float, float]]) -> Set[Tuple[float, float]]:
     """Flips all tiles on the board according to rules and returns the new board
 
     the tile board is a dict of coordinates of the centers of hexagons on a grid
@@ -58,24 +61,26 @@ def iterate_tiles(tile_board: Dict[Tuple[float, float], bool]) -> Dict[Tuple[flo
     black tiles stay black if they have 1 or 2 black neighbors
     white tiles turn black if they have 2 black neighbors
     """
-    new_board = defaultdict(bool)
-    tiles_to_check = set(tile_board.keys())
+    new_board = set()
+    tiles_to_check = set(tile_board)
     checked_tiles = set()
+    num_checked = 0
     while tiles_to_check:
+        num_checked += 1
         coordinate = tiles_to_check.pop()
         checked_tiles.add(coordinate)
         adjacent = get_adjacent(coordinate)
         count_adjacent = 0
         for location in adjacent:
-            if tile_board[location]:
+            if location in tile_board:
                 count_adjacent += 1
-            if tile_board[coordinate] and location not in checked_tiles:
+            if coordinate in tile_board and location not in checked_tiles:
                 tiles_to_check.add(location)
 
-        if tile_board[coordinate] and count_adjacent in [1,2]:
-            new_board[coordinate] = True
-        if (not tile_board[coordinate]) and count_adjacent == 2:
-            new_board[coordinate] = True
+        if (coordinate in tile_board and count_adjacent in [1, 2]) or (
+            coordinate not in tile_board and count_adjacent == 2
+        ):
+            new_board.add(coordinate)
     return new_board
 
 
@@ -83,10 +88,9 @@ if __name__ == "__main__":
     input = get_input()
     tiles = flip_tiles(input)
 
-    print(f"initially {sum(tiles.values())} black tiles")
+    print(f"initially {len(tiles)} black tiles")
 
-    for i in range(100):
+    for i in range(1000):
         tiles = iterate_tiles(tiles)
-        # print(f"Day {i+1}: {sum(tiles.values())}")
 
-    print(f"after 100 days: {sum(tiles.values())} black tiles")
+    print(f"after 100 days: {len(tiles)} black tiles")
