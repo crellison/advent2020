@@ -36,12 +36,12 @@ Usage: $ python apply_template.py language year day detail
 |14|python|
 |15|python|
 |16|python|
-|17| |
-|18| |
-|19| |
-|20| |
-|21| |
-|22| |
-|23| |
-|24| |
-|25| |
+|17|python|
+|18|python|
+|19|python|
+|20|python|
+|21|python|
+|22|python|
+|23|python|
+|24|python|
+|25|python|
