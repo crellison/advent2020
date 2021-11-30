@@ -20,7 +20,7 @@ mod tests {
     #[test]
     fn test_part_one() -> io::Result<()> {
         assert_eq!(
-            part_one(&get_input(2021, 1, InputType::Challenge, 0)?),
+            part_one(&get_input(2021, 3, InputType::Challenge, 0)?),
             "test\n"
         );
         Ok(())
@@ -29,7 +29,7 @@ mod tests {
     #[test]
     fn test_part_two() -> io::Result<()> {
         assert_eq!(
-            part_two(&get_input(2021, 1, InputType::Challenge, 0)?),
+            part_two(&get_input(2021, 3, InputType::Challenge, 0)?),
             "test\n"
         );
         Ok(())
