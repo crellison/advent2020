@@ -31,7 +31,7 @@ mod test {
 
     #[test]
     fn example_input() {
-        let input = get_input(2021, 0, InputType::Example, 0);
+        let input = get_input(0, 0, InputType::Challenge, 0);
         assert_eq!(input.is_ok(), true);
         assert_eq!(input.unwrap(), "test\n");
     }
