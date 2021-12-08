@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use regex::Regex;
+use std::collections::HashSet;
 
 #[allow(dead_code)]
 fn part_one(input: &str) -> i32 {
@@ -21,18 +21,40 @@ fn part_one(input: &str) -> i32 {
 }
 
 const CHARACTERS: [char; 7] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+/**
+KeyCharMap - creates a character map to parse seven-segment numbers
 
-#[allow(dead_code)]
-fn part_two(input: &str) -> i32 {
-    let mut sum = 0;
-    for line in input.lines() {
-        let mut line_chunked = line.split(" | ");
+Number Format shown below
 
-        let ten_numbers = line_chunked.next().unwrap().split(" ");
+```
+ aaa
+b   c
+b   c
+ ddd
+e   f
+e   f
+ ggg
+```
+
+* 1, 4, 7, and 8 can all be identified by segment count
+* 2, 3, and 5 all have five segments
+* 0, 6, and 9 all have six segments
+
+The latter two groups can be differentiated if you know which segment corresponds
+with the c, d, and f segments in the chart above (2,3,5 only need c and f).
+*/
+struct KeyCharMap {
+    c: String,
+    d: String,
+    f: String,
+}
+
+impl KeyCharMap {
+    pub fn new(ten_numbers: &str) -> Self {
         let (mut one, mut four): (HashSet<char>, HashSet<char>) = (HashSet::new(), HashSet::new());
         let (mut set_235, mut set_069) = (HashSet::from(CHARACTERS), HashSet::from(CHARACTERS));
 
-        for number in ten_numbers {
+        for number in ten_numbers.split(" ") {
             let number_set: HashSet<char> = HashSet::from_iter(number.chars());
             match number.len() {
                 2 => one.extend(number_set),
@@ -47,55 +69,78 @@ fn part_two(input: &str) -> i32 {
             };
         }
 
-        let pos_d = set_235.intersection(&four).next().unwrap();
-        let pos_f = set_069.intersection(&one).next().unwrap();
-        let pos_c = one.iter().filter(|letter| *letter != pos_f).next().unwrap();
-
-        let get_digit = |number: &str| {
-            let (has_c, has_d, has_f) = (
-                number.contains(&pos_c.to_string()),
-                number.contains(&pos_d.to_string()),
-                number.contains(&pos_f.to_string()),
-            );
-            match number.len() {
-                2 => 1,
-                3 => 7,
-                4 => 4,
-                5 => {
-                    if has_c && has_f {
-                        3
-                    } else if has_f {
-                        5
-                    } else {
-                        2
-                    }
-                }
-                6 => {
-                    if has_c && has_f {
-                        if has_d {
-                            return 9;
-                        }
-                        0
-                    } else {
-                        6
-                    }
-                }
-                7 => 8,
-                _ => panic!("Unexpected length"),
+        if let (Some(pos_d), Some(pos_f)) = (
+            set_235.intersection(&four).next(),
+            set_069.intersection(&one).next(),
+        ) {
+            if let Some(pos_c) = one.iter().filter(|letter| *letter != pos_f).next() {
+                return Self {
+                    c: pos_c.to_string(),
+                    d: pos_d.to_string(),
+                    f: pos_f.to_string(),
+                };
             }
-        };
+        }
+        panic!("Unable to find positions from input: {}", ten_numbers);
+    }
 
-        if let Some(output) = line_chunked.next() {
-            let output_numbers: i32 = output
-                .split(" ")
-                .enumerate()
-                .map(|(index, number)| get_digit(number) * 10_i32.pow((3 - index) as u32))
-                .sum();
-            // println!("{}\n", output_numbers);
-            sum += output_numbers;
+    pub fn get_digit(&self, number: &str) -> i32 {
+        let (has_c, has_d, has_f) = (
+            number.contains(&self.c),
+            number.contains(&self.d),
+            number.contains(&self.f),
+        );
+        match number.len() {
+            2 => 1,
+            3 => 7,
+            4 => 4,
+            5 => {
+                if has_c && has_f {
+                    3
+                } else if has_f {
+                    5
+                } else {
+                    2
+                }
+            }
+            6 => {
+                if has_c && has_f {
+                    if has_d {
+                        return 9;
+                    }
+                    0
+                } else {
+                    6
+                }
+            }
+            7 => 8,
+            _ => panic!("Unexpected length"),
         }
     }
-    sum
+}
+
+#[allow(dead_code)]
+fn part_two(input: &str) -> i32 {
+    let mut sum = 0;
+    for line in input.lines() {
+        let mut line_chunked = line.split(" | ");
+
+        if let Some(ten_numbers) = line_chunked.next() {
+            let key_char_map = KeyCharMap::new(ten_numbers);
+            if let Some(output) = line_chunked.next() {
+                let output_numbers: i32 = output
+                    .split(" ")
+                    .enumerate()
+                    .map(|(index, number)| {
+                        // always four digits
+                        key_char_map.get_digit(number) * 10_i32.pow((3 - index) as u32)
+                    })
+                    .sum();
+                sum += output_numbers;
+            }
+        }
+    }
+    return sum;
 }
 
 #[cfg(test)]
