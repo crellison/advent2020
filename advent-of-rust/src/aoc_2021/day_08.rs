@@ -20,7 +20,6 @@ fn part_one(input: &str) -> i32 {
     count_unique_nums
 }
 
-const CHARACTERS: [char; 7] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 /**
 KeyCharMap - creates a character map to parse seven-segment numbers
 
@@ -42,72 +41,59 @@ e   f
 
 The latter two groups can be differentiated if you know which segment corresponds
 with the c, d, and f segments in the chart above (2,3,5 only need c and f).
+
+Update: this is faster done with supersets
 */
 struct KeyCharMap {
-    c: String,
-    d: String,
-    f: String,
+    one: HashSet<char>,
+    four: HashSet<char>,
+    seven: HashSet<char>,
+    eight: HashSet<char>,
 }
 
 impl KeyCharMap {
     pub fn new(ten_numbers: &str) -> Self {
-        let (mut one, mut four): (HashSet<char>, HashSet<char>) = (HashSet::new(), HashSet::new());
-        let (mut set_235, mut set_069) = (HashSet::from(CHARACTERS), HashSet::from(CHARACTERS));
+        let mut key_char_map = Self {
+            one: HashSet::new(),
+            four: HashSet::new(),
+            seven: HashSet::new(),
+            eight: HashSet::new(),
+        };
 
         for number in ten_numbers.split(" ") {
             let number_set: HashSet<char> = HashSet::from_iter(number.chars());
             match number.len() {
-                2 => one.extend(number_set),
-                4 => four.extend(number_set),
-                5 => {
-                    set_235 = set_235.intersection(&number_set).copied().collect();
-                }
-                6 => {
-                    set_069 = set_069.intersection(&number_set).copied().collect();
-                }
+                2 => key_char_map.one.extend(number_set),
+                3 => key_char_map.seven.extend(number_set),
+                4 => key_char_map.four.extend(number_set),
+                7 => key_char_map.eight.extend(number_set),
                 _ => {}
             };
         }
 
-        if let (Some(pos_d), Some(pos_f)) = (
-            set_235.intersection(&four).next(),
-            set_069.intersection(&one).next(),
-        ) {
-            if let Some(pos_c) = one.iter().filter(|letter| *letter != pos_f).next() {
-                return Self {
-                    c: pos_c.to_string(),
-                    d: pos_d.to_string(),
-                    f: pos_f.to_string(),
-                };
-            }
-        }
-        panic!("Unable to find positions from input: {}", ten_numbers);
+        key_char_map
     }
 
     pub fn get_digit(&self, number: &str) -> i32 {
-        let (has_c, has_d, has_f) = (
-            number.contains(&self.c),
-            number.contains(&self.d),
-            number.contains(&self.f),
-        );
+        let char_set: HashSet<char> = HashSet::from_iter(number.chars());
         match number.len() {
             2 => 1,
             3 => 7,
             4 => 4,
             5 => {
-                if has_c && has_f {
+                if char_set.is_superset(&self.one) {
                     3
-                } else if has_f {
+                } else if char_set.is_superset(&self.four.difference(&self.one).copied().collect())
+                {
                     5
                 } else {
                     2
                 }
             }
             6 => {
-                if has_c && has_f {
-                    if has_d {
-                        return 9;
-                    }
+                if char_set.is_superset(&self.four) {
+                    9
+                } else if char_set.is_superset(&self.seven) {
                     0
                 } else {
                     6
