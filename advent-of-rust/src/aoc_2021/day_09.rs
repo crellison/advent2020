@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+const DIRECTIONS: [(i32, i32); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
+
 fn parse_input(input: &str) -> Vec<Vec<u32>> {
     let mut map: Vec<Vec<u32>> = Vec::new();
     for line in input.lines() {
@@ -22,20 +24,16 @@ fn get_local_minima(map: &Vec<Vec<u32>>) -> HashSet<(usize, usize)> {
     let mut local_minima: HashSet<(usize, usize)> = HashSet::new();
     for (x, vector) in map.iter().enumerate() {
         for (y, height) in vector.iter().enumerate() {
-            let diff_left = if x > 0 { map[x - 1][y] > *height } else { true };
-            let diff_right = if x < x_max {
-                map[x + 1][y] > *height
-            } else {
-                true
-            };
-            let diff_up = if y > 0 { map[x][y - 1] > *height } else { true };
-            let diff_down = if y < y_max {
-                map[x][y + 1] > *height
-            } else {
-                true
-            };
+            let is_minima = DIRECTIONS.iter().all(|(dx, dy)| {
+                let (next_x, next_y): (i32, i32) = ((x as i32) + dx, (y as i32) + dy);
+                if next_x < 0 || next_x > x_max as i32 || next_y < 0 || next_y > y_max as i32 {
+                    return true;
+                }
 
-            if diff_left && diff_right && diff_up && diff_down {
+                map[next_x as usize][next_y as usize] > *height
+            });
+
+            if is_minima {
                 local_minima.insert((x, y));
             }
         }
@@ -54,18 +52,16 @@ fn get_basin_size(map: &Vec<Vec<u32>>, start_x: usize, start_y: usize) -> usize 
                 continue;
             }
             checked_locations.insert((x, y));
-            if x > 0 && map[x - 1][y] != 9 {
-                queue.push((x - 1, y));
-            }
-            if x < x_max && map[x + 1][y] != 9 {
-                queue.push((x + 1, y));
-            }
-            if y > 0 && map[x][y - 1] != 9 {
-                queue.push((x, y - 1));
-            }
-            if y < y_max && map[x][y + 1] != 9 {
-                queue.push((x, y + 1))
-            }
+
+            DIRECTIONS.iter().for_each(|(dx, dy)| {
+                let (next_x, next_y): (i32, i32) = ((x as i32) + dx, (y as i32) + dy);
+                if next_x < 0 || next_x > x_max as i32 || next_y < 0 || next_y > y_max as i32 {
+                    return;
+                }
+                if map[next_x as usize][next_y as usize] != 9 {
+                    queue.push((next_x as usize, next_y as usize));
+                }
+            });
         }
     }
     checked_locations.len()
@@ -109,7 +105,10 @@ mod tests {
 
     #[test]
     fn test_part_two() -> io::Result<()> {
-        assert_eq!(part_two(&get_input(2021, 9, InputType::Challenge, 0)?), 900900);
+        assert_eq!(
+            part_two(&get_input(2021, 9, InputType::Challenge, 0)?),
+            900900
+        );
         Ok(())
     }
 }
