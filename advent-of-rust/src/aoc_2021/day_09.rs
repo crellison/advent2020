@@ -20,13 +20,13 @@ fn parse_input(input: &str) -> Vec<Vec<u32>> {
 }
 
 fn get_local_minima(map: &Vec<Vec<u32>>) -> HashSet<(usize, usize)> {
-    let (x_max, y_max) = (map.len() - 1, map[0].len() - 1);
+    let (x_max, y_max) = ((map.len() - 1) as i32, (map[0].len() - 1) as i32);
     let mut local_minima: HashSet<(usize, usize)> = HashSet::new();
     for (x, vector) in map.iter().enumerate() {
         for (y, height) in vector.iter().enumerate() {
             let is_minima = DIRECTIONS.iter().all(|(dx, dy)| {
                 let (next_x, next_y): (i32, i32) = ((x as i32) + dx, (y as i32) + dy);
-                if next_x < 0 || next_x > x_max as i32 || next_y < 0 || next_y > y_max as i32 {
+                if next_x < 0 || next_x > x_max || next_y < 0 || next_y > y_max {
                     return true;
                 }
 
@@ -44,7 +44,7 @@ fn get_local_minima(map: &Vec<Vec<u32>>) -> HashSet<(usize, usize)> {
 fn get_basin_size(map: &Vec<Vec<u32>>, start_x: usize, start_y: usize) -> usize {
     let mut checked_locations: HashSet<(usize, usize)> = HashSet::new();
     let mut queue: Vec<(usize, usize)> = vec![(start_x, start_y)];
-    let (x_max, y_max) = (map.len() - 1, map[0].len() - 1);
+    let (x_max, y_max) = ((map.len() - 1) as i32, (map[0].len() - 1) as i32);
 
     while queue.len() > 0 {
         if let Some((x, y)) = queue.pop() {
@@ -54,8 +54,8 @@ fn get_basin_size(map: &Vec<Vec<u32>>, start_x: usize, start_y: usize) -> usize 
             checked_locations.insert((x, y));
 
             DIRECTIONS.iter().for_each(|(dx, dy)| {
-                let (next_x, next_y): (i32, i32) = ((x as i32) + dx, (y as i32) + dy);
-                if next_x < 0 || next_x > x_max as i32 || next_y < 0 || next_y > y_max as i32 {
+                let (next_x, next_y) = ((x as i32) + dx, (y as i32) + dy);
+                if next_x < 0 || next_x > x_max || next_y < 0 || next_y > y_max {
                     return;
                 }
                 if map[next_x as usize][next_y as usize] != 9 {
@@ -71,10 +71,7 @@ fn get_basin_size(map: &Vec<Vec<u32>>, start_x: usize, start_y: usize) -> usize 
 fn part_one(input: &str) -> u32 {
     let map = parse_input(input);
     let local_minima = get_local_minima(&map);
-    let local_minima_sum = local_minima
-        .iter()
-        .fold(0, |acc, (x, y)| acc + map[*x][*y] + 1);
-    local_minima_sum
+    local_minima.iter().map(|(x, y)| map[*x][*y] + 1).sum()
 }
 
 #[allow(dead_code)]
@@ -88,7 +85,7 @@ fn part_two(input: &str) -> usize {
     let basin_count = basin_sizes.len();
     basin_sizes.sort();
 
-    basin_sizes[basin_count - 1] * basin_sizes[basin_count - 2] * basin_sizes[basin_count - 3]
+    [1,2,3].iter().map(|x| basin_sizes[basin_count - x]).product()
 }
 
 #[cfg(test)]
