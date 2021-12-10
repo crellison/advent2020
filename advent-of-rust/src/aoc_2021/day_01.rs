@@ -1,35 +1,38 @@
 #[allow(dead_code)]
 fn part_one(input: &str) -> u16 {
     let mut increases: u16 = 0;
-    let mut last_depth: u16 = input.lines().next().unwrap().parse().unwrap();
+    let mut last_depth = u16::MAX;
     for line in input.lines() {
-      let next_depth: u16 = line.parse().unwrap();
-      if next_depth > last_depth {
-          increases += 1;
-      }
-      last_depth = next_depth;
+        if let Ok(next_depth) = line.parse::<u16>() {
+            if next_depth > last_depth {
+                increases += 1;
+            }
+            last_depth = next_depth;
+        }
     }
     increases
 }
 
 #[allow(dead_code)]
 fn part_two(input: &str) -> u16 {
-    let mut input_iter = input.lines();
     let mut increases: u16 = 0;
-    let mut last_three: (u16, u16, u16) = (
-        input_iter.next().unwrap().parse().unwrap(),
-        input_iter.next().unwrap().parse().unwrap(),
-        input_iter.next().unwrap().parse().unwrap(),
-    );
-    let mut last_group_sum = last_three.0 + last_three.1 + last_three.2;
-    for line in input_iter {
-      let next_depth: u16 = line.parse().unwrap();
-      let next_group_sum = last_three.1 + last_three.2 + next_depth;
-      if next_group_sum > last_group_sum {
-          increases += 1;
-      }
-      last_three = (last_three.1, last_three.2, next_depth);
-      last_group_sum = next_group_sum;
+
+    let mut last_three = (u16::MAX, u16::MAX, u16::MAX);
+    let mut last_group_sum = u16::MAX;
+    for line in input.lines() {
+        if let Ok(next_depth) = line.parse::<u16>() {
+            let next_group_sum: u16;
+            if last_three.1 == u16::MAX || last_three.2 == u16::MAX {
+                next_group_sum = u16::MAX;
+            } else {
+                next_group_sum = last_three.1 + last_three.2 + next_depth;
+            }
+            if next_group_sum > last_group_sum {
+                increases += 1;
+            }
+            last_three = (last_three.1, last_three.2, next_depth);
+            last_group_sum = next_group_sum;
+        }
     }
     increases
 }
