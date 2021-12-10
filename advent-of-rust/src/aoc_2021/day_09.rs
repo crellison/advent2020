@@ -1,5 +1,18 @@
+use crate::utils::{get_input, InputType};
 use std::collections::HashSet;
+use std::io;
 
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 9, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 9, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
 const DIRECTIONS: [(i32, i32); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
 
 fn parse_input(input: &str) -> Vec<Vec<u32>> {
@@ -67,14 +80,12 @@ fn get_basin_size(map: &Vec<Vec<u32>>, start_x: usize, start_y: usize) -> usize 
     checked_locations.len()
 }
 
-#[allow(dead_code)]
 fn part_one(input: &str) -> u32 {
     let map = parse_input(input);
     let local_minima = get_local_minima(&map);
     local_minima.iter().map(|(x, y)| map[*x][*y] + 1).sum()
 }
 
-#[allow(dead_code)]
 fn part_two(input: &str) -> usize {
     let map = parse_input(input);
     let local_minima = get_local_minima(&map);
@@ -85,27 +96,8 @@ fn part_two(input: &str) -> usize {
     let basin_count = basin_sizes.len();
     basin_sizes.sort();
 
-    [1,2,3].iter().map(|x| basin_sizes[basin_count - x]).product()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(part_one(&get_input(2021, 9, InputType::Challenge, 0)?), 439);
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 9, InputType::Challenge, 0)?),
-            900900
-        );
-        Ok(())
-    }
+    [1, 2, 3]
+        .iter()
+        .map(|x| basin_sizes[basin_count - x])
+        .product()
 }

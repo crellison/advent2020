@@ -1,4 +1,18 @@
+use crate::utils::{get_input, InputType};
 use std::collections::{HashMap, HashSet};
+use std::io;
+
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 4, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 4, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
 
 #[derive(Debug)]
 struct BingoSpace {
@@ -58,8 +72,12 @@ impl BingoBoard {
     }
 
     fn is_win(&self) -> bool {
-        let board_spaces: Vec<(usize, usize)> =
-            self.board.values().filter(|space| space.called).map(|x| x.loc()).collect();
+        let board_spaces: Vec<(usize, usize)> = self
+            .board
+            .values()
+            .filter(|space| space.called)
+            .map(|x| x.loc())
+            .collect();
         let horiz_win = (0..5_usize)
             .any(|x| (0..5_usize).fold(true, |acc, y| acc && board_spaces.contains(&(x, y))));
         let vert_win = (0..5_usize)
@@ -68,11 +86,13 @@ impl BingoBoard {
     }
 
     pub fn sum_unmarked_numbers(&self) -> u32 {
-        self.board.keys().filter(|key| !self.board.get(key).unwrap().called).sum()
+        self.board
+            .keys()
+            .filter(|key| !self.board.get(key).unwrap().called)
+            .sum()
     }
 }
 
-#[allow(dead_code)]
 fn part_one(input: &str) -> u32 {
     let mut all_input_data = input.split("\n\n");
     let numbers_called = all_input_data
@@ -87,14 +107,13 @@ fn part_one(input: &str) -> u32 {
         for i in 0..boards.len() {
             if boards[i].call_num(&number) {
                 println!("{:?}", boards[i]);
-                return boards[i].sum_unmarked_numbers() * number
+                return boards[i].sum_unmarked_numbers() * number;
             }
         }
     }
     0
 }
 
-#[allow(dead_code)]
 fn part_two(input: &str) -> u32 {
     let mut all_input_data = input.split("\n\n");
     let numbers_called = all_input_data
@@ -104,7 +123,7 @@ fn part_two(input: &str) -> u32 {
         .map(|x| x.parse::<u32>().unwrap());
 
     let mut boards: Vec<BingoBoard> = all_input_data.map(|input| BingoBoard::new(input)).collect();
-    
+
     let mut last_win_val: u32 = 0;
     let mut won_boards: HashSet<usize> = HashSet::new();
 
@@ -120,29 +139,4 @@ fn part_two(input: &str) -> u32 {
         }
     }
     last_win_val
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(
-            part_one(&get_input(2021, 4, InputType::Challenge, 0)?),
-            69579
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 4, InputType::Challenge, 0)?),
-            1924
-        );
-        Ok(())
-    }
 }

@@ -1,7 +1,20 @@
+use crate::utils::{get_input, InputType};
 use regex::Regex;
 use std::collections::HashSet;
+use std::io;
 
-#[allow(dead_code)]
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 8, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 8, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
+
 fn part_one(input: &str) -> i32 {
     let number_match = Regex::new(r"[a-g]+").unwrap();
     let mut count_unique_nums = 0;
@@ -105,7 +118,6 @@ impl KeyCharMap {
     }
 }
 
-#[allow(dead_code)]
 fn part_two(input: &str) -> i32 {
     let mut sum = 0;
     for line in input.lines() {
@@ -127,26 +139,4 @@ fn part_two(input: &str) -> i32 {
         }
     }
     return sum;
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(part_one(&get_input(2021, 8, InputType::Challenge, 0)?), 239);
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 8, InputType::Challenge, 0)?),
-            946346
-        );
-        Ok(())
-    }
 }

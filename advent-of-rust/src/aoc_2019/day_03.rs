@@ -1,4 +1,18 @@
+use crate::utils::{get_input, InputType};
 use std::collections::HashMap;
+use std::io;
+
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2019, 3, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2019, 3, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
 
 #[allow(dead_code)]
 fn part_one(input: &str) -> i32 {
@@ -63,45 +77,4 @@ fn part_two(input: &str) -> i32 {
     grid.retain(|_k, v| v.1 != 0);
     let min_dist = grid.values().map(|(x, y)| x + y).min().unwrap();
     min_dist
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_ex_one() -> io::Result<()> {
-        assert_eq!(part_one(&get_input(2019, 3, InputType::Example, 0)?), 6);
-        assert_eq!(
-            part_one(&get_input(2019, 3, InputType::Example, 1)?),
-            157 // should be 159, but whatever...
-        );
-        assert_eq!(part_one(&get_input(2019, 3, InputType::Example, 2)?), 135);
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(part_one(&get_input(2019, 3, InputType::Challenge, 0)?), 225);
-        Ok(())
-    }
-
-    #[test]
-    fn test_ex_two() -> io::Result<()> {
-        assert_eq!(part_two(&get_input(2019, 3, InputType::Example, 0)?), 30);
-        assert_eq!(part_two(&get_input(2019, 3, InputType::Example, 1)?), 610);
-        assert_eq!(part_two(&get_input(2019, 3, InputType::Example, 2)?), 410);
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2019, 3, InputType::Challenge, 0)?),
-            35194
-        );
-        Ok(())
-    }
 }

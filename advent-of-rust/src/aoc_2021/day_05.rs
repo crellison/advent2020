@@ -1,5 +1,18 @@
 use std::collections::HashMap;
+use crate::utils::{get_input, InputType};
+use std::io;
 
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 5, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 5, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
 struct FloorMap {
     walls: HashMap<(i32, i32), i32>,
 }
@@ -46,7 +59,7 @@ fn diff_dir(a: i32, b: i32) -> i32 {
     };
 }
 
-#[allow(dead_code)]
+
 fn part_one(input: &str) -> i32 {
     let mut walls = FloorMap::new();
 
@@ -68,7 +81,7 @@ fn part_one(input: &str) -> i32 {
     walls.sum_walls(2)
 }
 
-#[allow(dead_code)]
+
 fn part_two(input: &str) -> i32 {
     let mut walls = FloorMap::new();
 
@@ -85,27 +98,3 @@ fn part_two(input: &str) -> i32 {
     walls.sum_walls(2)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(
-            part_one(&get_input(2021, 5, InputType::Challenge, 0)?),
-            5585
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 5, InputType::Challenge, 0)?),
-            17193
-        );
-        Ok(())
-    }
-}

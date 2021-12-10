@@ -1,3 +1,18 @@
+use crate::utils::{get_input, InputType};
+use std::io;
+
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 7, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 7, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
+
 fn calc_changes(positions: &Vec<i32>, target: i32) -> i32 {
     positions
         .iter()
@@ -18,7 +33,6 @@ fn parse_input(input: &str) -> Vec<i32> {
         .collect::<Vec<i32>>()
 }
 
-#[allow(dead_code)]
 fn part_one(input: &str) -> i32 {
     let crabs = parse_input(input);
     let (upper, lower) = (*crabs.iter().max().unwrap(), *crabs.iter().min().unwrap());
@@ -29,7 +43,6 @@ fn part_one(input: &str) -> i32 {
     0
 }
 
-#[allow(dead_code)]
 fn part_two(input: &str) -> i32 {
     let crabs = parse_input(input);
     let (upper, lower) = (*crabs.iter().max().unwrap(), *crabs.iter().min().unwrap());
@@ -38,39 +51,4 @@ fn part_two(input: &str) -> i32 {
         return min_moves;
     }
     0
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{calc_changes, part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_calc_changes() -> io::Result<()> {
-        let test_vec = vec![16, 5, 4, 1];
-        assert_eq!(calc_changes(&test_vec, 3), 18);
-        assert_eq!(calc_changes(&test_vec, 4), 16);
-        assert_eq!(calc_changes(&test_vec, 5), 16);
-        assert_eq!(calc_changes(&test_vec, 6), 18);
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(
-            part_one(&get_input(2021, 7, InputType::Challenge, 0)?),
-            336040
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 7, InputType::Challenge, 0)?),
-            94813675
-        );
-        Ok(())
-    }
 }

@@ -1,3 +1,18 @@
+use crate::utils::{get_input, InputType};
+use std::io;
+
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2019, 2, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2019, 2, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
+
 #[allow(dead_code)]
 fn part_one(input: &str) -> u32 {
     let first_line = input.lines().next().unwrap();
@@ -67,41 +82,4 @@ fn part_two(input: &str) -> u32 {
         }
     }
     panic!("No valid combination found!")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    // examples only run with 1202 alarm removed
-
-    // #[test]
-    // fn test_part_one_ex() -> io::Result<()> {
-    //     assert_eq!(part_one(&get_input(2019, 2, InputType::Example, 0)?), 3500);
-    //     assert_eq!(part_one(&get_input(2019, 2, InputType::Example, 1)?), 2);
-    //     assert_eq!(part_one(&get_input(2019, 2, InputType::Example, 2)?), 2);
-    //     assert_eq!(part_one(&get_input(2019, 2, InputType::Example, 3)?), 2);
-    //     assert_eq!(part_one(&get_input(2019, 2, InputType::Example, 4)?), 30);
-    //     Ok(())
-    // }
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(
-            part_one(&get_input(2019, 2, InputType::Challenge, 0)?),
-            2894520 // 406198
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2019, 2, InputType::Challenge, 0)?),
-            9342
-        );
-        Ok(())
-    }
 }

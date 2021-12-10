@@ -1,4 +1,18 @@
-#[allow(dead_code)]
+use crate::utils::{get_input, InputType};
+use std::io;
+
+pub fn main() -> io::Result<()> {
+    println!(
+        "part one: {}",
+        part_one(&get_input(2021, 1, InputType::Challenge, 0)?)
+    );
+    println!(
+        "part two: {}",
+        part_two(&get_input(2021, 1, InputType::Challenge, 0)?)
+    );
+    Ok(())
+}
+
 fn part_one(input: &str) -> u16 {
     let mut increases: u16 = 0;
     let mut last_depth = u16::MAX;
@@ -13,7 +27,6 @@ fn part_one(input: &str) -> u16 {
     increases
 }
 
-#[allow(dead_code)]
 fn part_two(input: &str) -> u16 {
     let mut increases: u16 = 0;
 
@@ -35,29 +48,4 @@ fn part_two(input: &str) -> u16 {
         }
     }
     increases
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{part_one, part_two};
-    use crate::utils::{get_input, InputType};
-    use std::io;
-
-    #[test]
-    fn test_part_one() -> io::Result<()> {
-        assert_eq!(
-            part_one(&get_input(2021, 1, InputType::Challenge, 0)?),
-            1527
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_part_two() -> io::Result<()> {
-        assert_eq!(
-            part_two(&get_input(2021, 1, InputType::Challenge, 0)?),
-            1575
-        );
-        Ok(())
-    }
 }
