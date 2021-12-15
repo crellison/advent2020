@@ -51,7 +51,7 @@ impl SlowMap {
             let mut tmp: Vec<char> = Vec::new();
             for i in 0..self.template.len() - 1 {
                 tmp.push(self.template[i]);
-                let window = String::from_iter([self.template[i], self.template[i + 1]]);
+                let window = format!("{}{}", self.template[i], self.template[i + 1]);
                 if let Some(val) = self.mapping.get(&window) {
                     tmp.extend(val.chars());
                 }
@@ -65,11 +65,7 @@ impl SlowMap {
         self.template
             .iter()
             .fold(HashMap::new(), |mut acc: HashMap<char, u32>, cur| {
-                if let Some(count) = acc.get_mut(cur) {
-                    *count += 1;
-                } else {
-                    acc.insert(*cur, 0);
-                }
+                acc.insert(*cur, *acc.get(cur).unwrap_or(&0) + 1);
                 acc
             })
     }
@@ -100,12 +96,8 @@ impl FastMap {
             .collect::<Vec<char>>();
         let mut char_pairs: HashMap<String, u64> = HashMap::new();
         for i in 0..first_line.len() - 1 {
-            let pair = String::from_iter([first_line[i], first_line[i + 1]]);
-            if let Some(count) = char_pairs.get_mut(&pair) {
-                *count += 1
-            } else {
-                char_pairs.insert(pair, 1);
-            }
+            let pair = format!("{}{}", first_line[i], first_line[i + 1]);
+            char_pairs.insert(pair.clone(), *char_pairs.get(&pair).unwrap_or(&0) + 1);
         }
         let mapping = build_mapping(input);
 
@@ -122,20 +114,14 @@ impl FastMap {
             let mut tmp: HashMap<String, u64> = HashMap::new();
 
             let mut insert_pair = |pair: &String, pair_count: &u64| {
-                if let Some(count) = tmp.get_mut(pair) {
-                    *count += pair_count
-                } else {
-                    tmp.insert(pair.to_string(), *pair_count);
-                }
+                tmp.insert(pair.to_string(), *tmp.get(pair).unwrap_or(&0) + pair_count);
             };
 
             for (pair, pair_count) in &self.char_pairs {
                 if let Some(middle_char) = self.mapping.get(pair) {
-                    let pair_elts = pair.chars().map(|c| c.to_string()).collect::<Vec<String>>();
-                    let first_pair =
-                        String::from_iter([pair_elts[0].to_string(), middle_char.to_string()]);
-                    let second_pair =
-                        String::from_iter([middle_char.to_string(), pair_elts[1].to_string()]);
+                    let pair_elts = pair.chars().collect::<Vec<char>>();
+                    let first_pair = format!("{}{}", pair_elts[0], middle_char);
+                    let second_pair = format!("{}{}", middle_char, pair_elts[1]);
                     insert_pair(&first_pair, pair_count);
                     insert_pair(&second_pair, pair_count);
                 } else {
@@ -155,21 +141,17 @@ impl FastMap {
             char_counts.insert(self.first_letter, 1);
             char_counts.insert(self.last_letter, 1);
         }
-    
+
         for (pair, pair_count) in &self.char_pairs {
             for letter in pair.chars() {
-                if let Some(count) = char_counts.get_mut(&letter) {
-                    *count += pair_count;
-                } else {
-                    char_counts.insert(letter, *pair_count);
-                }
+                char_counts.insert(letter, *char_counts.get(&letter).unwrap_or(&0) + pair_count);
             }
         }
-    
+
         for count in char_counts.values_mut() {
             *count /= 2;
         }
-    
+
         char_counts
     }
 }
