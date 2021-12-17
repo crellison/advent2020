@@ -1,13 +1,38 @@
-use std::{collections::HashSet, io, ops::Range, time::{Instant, Duration}};
+use std::{
+    collections::HashSet,
+    io,
+    ops::Range,
+    time::{Duration, Instant},
+};
 
-const EXAMPLE: (Range<i32>, Range<i32>) = (20..30 + 1, -10..-5 + 1);
-const CHALLENGE: (Range<i32>, Range<i32>) = (207..263 + 1, -115..-63 + 1);
-const BIG_CHALLENGE: (Range<i32>, Range<i32>) = (1000..2000 + 1, -2000..-1800 + 1);
+use regex::Regex;
+
+use crate::utils::{get_input, InputType};
 
 pub fn main() -> io::Result<()> {
-    println!("part one: {:?}", part_one(CHALLENGE));
-    println!("part two: {:?}", part_two(BIG_CHALLENGE));
+    let input = &get_input(2021, 17, InputType::Challenge, 0)?;
+    let target = parse_input(input);
+    println!("part one: {:?}", part_one(&target));
+    println!("part two: {:?}", part_two(&target));
     Ok(())
+}
+
+fn parse_input(input: &str) -> (Range<i32>, Range<i32>) {
+    let x_re = Regex::new(r"x=(-?\d+)..(-?\d+)").unwrap();
+    let y_re = Regex::new(r"y=(-?\d+)..(-?\d+)").unwrap();
+
+    let mut x_target = 0..0;
+    let mut y_target = 0..0;
+    if let (Some(x_cap), Some(y_cap)) = (x_re.captures(input), y_re.captures(input)) {
+        if let (Ok(x_min), Ok(x_max)) = (x_cap[1].parse::<i32>(), x_cap[2].parse::<i32>()) {
+            x_target = x_min..x_max + 1;
+        }
+        if let (Ok(y_min), Ok(y_max)) = (y_cap[1].parse::<i32>(), y_cap[2].parse::<i32>()) {
+            y_target = y_min..y_max + 1;
+        }
+    }
+
+    (x_target, y_target)
 }
 
 #[derive(Debug, Default)]
@@ -29,7 +54,7 @@ impl ProbeTarget {
         let (mut y, mut cur_dy) = (0, dy);
         for step in 0.. {
             if y < self.y_target.start {
-                break
+                break;
             }
 
             if self.y_target.contains(&y) {
@@ -47,7 +72,7 @@ impl ProbeTarget {
             let x = if step >= dx {
                 dx * (dx + 1) / 2
             } else {
-                step * (step + 1) / 2 + (dx-step) * step
+                step * (step + 1) / 2 + (dx - step) * step
             };
 
             if self.x_target.contains(&x) {
@@ -82,7 +107,7 @@ impl ProbeTarget {
     }
 
     fn will_hit(&self, initial_dx: i32, initial_dy: i32) -> bool {
-        let (mut x,mut y) = (0,0);
+        let (mut x, mut y) = (0, 0);
         let (mut dx, mut dy) = (initial_dx, initial_dy);
 
         while x < self.x_target.end && y > self.y_target.start {
@@ -96,13 +121,12 @@ impl ProbeTarget {
         }
 
         self.x_target.contains(&x) && self.y_target.contains(&y)
-
     }
 }
 
-fn part_one(target: (Range<i32>, Range<i32>)) -> i32 {
+fn part_one(target: &(Range<i32>, Range<i32>)) -> i32 {
     let mut max = 0;
-    let probe = ProbeTarget::new(&target);
+    let probe = ProbeTarget::new(target);
     for (_, dy) in probe.hits_fast() {
         let height = dy * (dy + 1) / 2;
         if max < height {
@@ -112,15 +136,15 @@ fn part_one(target: (Range<i32>, Range<i32>)) -> i32 {
     max
 }
 
-fn part_two(target: (Range<i32>, Range<i32>)) -> usize {
-    let probe = ProbeTarget::new(&target);
+fn part_two(target: &(Range<i32>, Range<i32>)) -> usize {
+    let probe = ProbeTarget::new(target);
 
     let mut elapsed: Duration;
     let mut now = Instant::now();
     probe.hits();
     elapsed = now.elapsed();
     println!("took {} micros with hits", elapsed.as_micros());
-    
+
     now = Instant::now();
     probe.hits_fast();
     elapsed = now.elapsed();
