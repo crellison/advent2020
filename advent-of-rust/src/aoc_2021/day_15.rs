@@ -1,12 +1,12 @@
 use crate::utils::{get_input, InputType};
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashSet};
 use std::io;
 
 pub fn main() -> io::Result<()> {
     println!(
         "part one: {}",
-        part_one(&get_input(2021, 15, InputType::Example, 2)?)
+        part_one(&get_input(2021, 15, InputType::Challenge, 0)?)
     );
     println!(
         "part two: {}",
@@ -26,18 +26,16 @@ fn parse_input(input: &str) -> Vec<Vec<u32>> {
         .collect::<Vec<Vec<u32>>>()
 }
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 struct PointToCheck {
     cost: u32,
     position: (usize, usize),
+    estimate: u32,
 }
 
 impl Ord for PointToCheck {
     fn cmp(&self, other: &PointToCheck) -> Ordering {
-        other
-            .cost
-            .cmp(&self.cost)
-            .then_with(|| self.position.cmp(&other.position))
+        (other.cost, other.estimate).cmp(&(self.cost, self.estimate))
     }
 }
 
@@ -49,41 +47,67 @@ impl PartialOrd for PointToCheck {
 
 #[derive(Default)]
 struct TwoDimMap {
-    map: Vec<Vec<u32>>,
+    cost_map: Vec<Vec<u32>>,
     end: (usize, usize),
     start: (usize, usize),
+    dim: (usize, usize),
 }
 
 impl TwoDimMap {
-    fn new(map: Vec<Vec<u32>>, end: (usize, usize), start: (usize, usize)) -> Self {
-        Self { map, end, start }
+    fn new(cost_map: Vec<Vec<u32>>, end: (usize, usize), start: (usize, usize)) -> Self {
+        let dim = (cost_map.len(), cost_map[0].len());
+        Self {
+            cost_map,
+            end,
+            start,
+            dim,
+        }
     }
 
-    fn get_neighbors(&self, point: &(usize, usize)) -> HashSet<(usize, usize)> {
-        let mut neighbors: HashSet<(usize, usize)> = HashSet::new();
+    fn get_neighbors(&self, point: &PointToCheck) -> HashSet<PointToCheck> {
+        let mut neighbors: HashSet<PointToCheck> = HashSet::new();
 
-        if point.0 > 0 {
-            neighbors.insert((point.0 - 1, point.1));
+        if point.position.0 > 0 {
+            let position = (point.position.0 - 1, point.position.1);
+            neighbors.insert(PointToCheck {
+                position,
+                cost: point.cost + self.get_step_cost(&position),
+                estimate: self.dist_to_end(&position),
+            });
         }
-        if point.0 < self.end.0 {
-            neighbors.insert((point.0 + 1, point.1));
+        if point.position.0 < self.end.0 {
+            let position = (point.position.0 + 1, point.position.1);
+            neighbors.insert(PointToCheck {
+                position,
+                cost: point.cost + self.get_step_cost(&position),
+                estimate: self.dist_to_end(&position),
+            });
         }
-        if point.1 > 0 {
-            neighbors.insert((point.0, point.1 - 1));
+        if point.position.1 > 0 {
+            let position = (point.position.0, point.position.1 - 1);
+            neighbors.insert(PointToCheck {
+                position,
+                cost: point.cost + self.get_step_cost(&position),
+                estimate: self.dist_to_end(&position),
+            });
         }
-        if point.1 < self.end.0 {
-            neighbors.insert((point.0, point.1 + 1));
+        if point.position.1 < self.end.0 {
+            let position = (point.position.0, point.position.1 + 1);
+            neighbors.insert(PointToCheck {
+                position,
+                cost: point.cost + self.get_step_cost(&position),
+                estimate: self.dist_to_end(&position),
+            });
         }
 
         neighbors
     }
 
     fn get_step_cost(&self, point: &(usize, usize)) -> u32 {
-        let dim = (self.map.len(), self.map[0].len());
-        let x = point.0 % dim.0;
-        let y = point.1 % dim.1;
-        let scale_factor = (point.0 / dim.0 + point.1 / dim.1) as u32;
-        let new_val = (self.map[x][y] + scale_factor) % 9;
+        let x = point.0 % self.dim.0;
+        let y = point.1 % self.dim.1;
+        let scale_factor = (point.0 / self.dim.0 + point.1 / self.dim.1) as u32;
+        let new_val = (self.cost_map[x][y] + scale_factor) % 9;
         if new_val == 0 {
             9
         } else {
@@ -91,76 +115,37 @@ impl TwoDimMap {
         }
     }
 
+    fn dist_to_end(&self, point: &(usize, usize)) -> u32 {
+        (self.end.0 - point.0 + self.end.1 - point.1) as u32
+    }
+
     fn find_cheapest_path_cost(&self) -> u32 {
         if self.start == self.end {
             return 0;
         }
 
-        let expensive_point = PointToCheck {
-            cost: u32::MAX,
-            position: self.start,
-        };
-        let mut a_star_costs: HashMap<(usize, usize), PointToCheck> = HashMap::new();
-        a_star_costs.insert(
-            self.start,
-            PointToCheck {
-                cost: 0,
-                position: self.start,
-            },
-        );
-
-        let dist_to_end =
-            |point: &(usize, usize)| (self.end.0 - point.0 + self.end.1 - point.1) as u32;
-
+        let mut seen_points: HashSet<(usize, usize)> = HashSet::new();
         let mut open: BinaryHeap<PointToCheck> = BinaryHeap::new();
-        open.push(PointToCheck {
+        let start_point = PointToCheck {
             position: self.start,
-            cost: dist_to_end(&self.start),
-        });
+            cost: 0,
+            estimate: self.dist_to_end(&self.start),
+        };
+        open.push(start_point);
 
-        let mut cost_to_end = u32::MAX;
-
-        while let Some(PointToCheck {
-            cost: _estimated_cost,
-            position,
-        }) = open.pop()
-        {
-            let PointToCheck { cost, position: _ } = a_star_costs.get(&position).unwrap().clone();
-
-            if cost > cost_to_end {
-                continue;
+        while let Some(current) = open.pop() {
+            if current.position == self.end {
+                return current.cost;
             }
 
-            for next_point in self.get_neighbors(&position) {
-                let next_cost = cost + self.get_step_cost(&next_point);
-
-                if !a_star_costs.contains_key(&next_point)
-                    || a_star_costs
-                        .get(&next_point)
-                        .unwrap_or(&expensive_point)
-                        .cost
-                        > next_cost
-                {
-                    a_star_costs.insert(
-                        next_point,
-                        PointToCheck {
-                            cost: next_cost,
-                            position,
-                        },
-                    );
-                    open.push(PointToCheck {
-                        position: next_point,
-                        cost: next_cost + dist_to_end(&next_point),
-                    });
+            for next in self.get_neighbors(&current) {
+                if !seen_points.contains(&next.position) {
+                    seen_points.insert(next.position);
+                    open.push(next);
                 }
             }
-
-            if position == self.end {
-                cost_to_end = a_star_costs.get(&self.end).unwrap_or(&expensive_point).cost;
-            }
         }
-
-        cost_to_end
+        u32::MAX
     }
 }
 
