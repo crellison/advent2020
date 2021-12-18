@@ -106,7 +106,6 @@ fn part_one(input: &str) -> u32 {
     for number in numbers_called {
         for i in 0..boards.len() {
             if boards[i].call_num(&number) {
-                println!("{:?}", boards[i]);
                 return boards[i].sum_unmarked_numbers() * number;
             }
         }

@@ -69,7 +69,6 @@ fn part_two(input: &str) -> i32 {
             }
 
             if let Some(index) = valid_indices.iter().next() {
-                println!("final number is {:?}", lines[*index]);
                 return lines[*index]
                     .iter()
                     .enumerate()
