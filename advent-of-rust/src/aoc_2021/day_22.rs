@@ -18,16 +18,17 @@ pub fn main() -> io::Result<()> {
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone, Copy)]
 struct ConwayRange {
-    x_min: i32,
-    x_max: i32,
-    y_min: i32,
-    y_max: i32,
-    z_min: i32,
-    z_max: i32,
+    on: bool,
+    x_min: i64,
+    x_max: i64,
+    y_min: i64,
+    y_max: i64,
+    z_min: i64,
+    z_max: i64,
 }
 
 impl ConwayRange {
-    fn new(x_min: i32, x_max: i32, y_min: i32, y_max: i32, z_min: i32, z_max: i32) -> Self {
+    fn new(on: bool, x_min: i64, x_max: i64, y_min: i64, y_max: i64, z_min: i64, z_max: i64) -> Self {
         if x_max < x_min || y_max < y_min || z_max < z_min {
             panic!(
                 "Invalid args for ConwayRange: expected {} <= {}, {} <= {}, {} <= {}",
@@ -35,6 +36,7 @@ impl ConwayRange {
             )
         }
         Self {
+            on,
             x_min,
             x_max,
             y_min,
@@ -44,25 +46,29 @@ impl ConwayRange {
         }
     }
 
-    fn from_tuples(x: (i32, i32), y: (i32, i32), z: (i32, i32)) -> Self {
-        Self::new(x.0, x.1, y.0, y.1, z.0, z.1)
+    fn from_tuples(on: bool, x: (i64, i64), y: (i64, i64), z: (i64, i64)) -> Self {
+        Self::new(on, x.0, x.1, y.0, y.1, z.0, z.1)
     }
 
-    fn from_big_tuple(
-        (x_min, x_max, y_min, y_max, z_min, z_max): (i32, i32, i32, i32, i32, i32),
+    fn from_big_tuple(on: bool,
+        (x_min, x_max, y_min, y_max, z_min, z_max): (i64, i64, i64, i64, i64, i64),
     ) -> Self {
-        Self::new(x_min, x_max, y_min, y_max, z_min, z_max)
+        Self::new(on, x_min, x_max, y_min, y_max, z_min, z_max)
     }
 
-    fn len(&self) -> usize {
-        ((self.x_max - self.x_min + 1)
+    fn is_on(&self) -> bool {
+        self.on
+    }
+
+    fn flip(&self) -> Self {
+        Self::new(!self.on, self.x_min, self.x_max, self.y_min, self.y_max, self.z_min, self.z_max)
+    }
+
+    fn len(&self) -> i64 {
+        let volume = (self.x_max - self.x_min + 1)
             * (self.y_max - self.y_min + 1)
-            * (self.z_max - self.z_min + 1)) as usize
-    }
-
-    fn in_range(&self, min: i32, max: i32) -> bool {
-        self.x_min.min(self.y_min).min(self.z_min) >= min
-            && self.x_max.max(self.y_max).max(self.z_max) <= max
+            * (self.z_max - self.z_min + 1);
+        if self.on { volume } else { volume * -1 }
     }
 
     fn intersects(&self, other: &ConwayRange) -> bool {
@@ -99,7 +105,8 @@ impl ConwayRange {
                         // skip invalid cubes
                         continue;
                     }
-                    let current_range = ConwayRange::from_tuples(x_span, y_span, z_span);
+                    // keeping only self cubes, so on is self
+                    let current_range = ConwayRange::from_tuples(self.on, x_span, y_span, z_span);
                     if current_range.intersects(self) && !current_range.intersects(comp) {
                         remainder.push(current_range);
                     }
@@ -111,18 +118,18 @@ impl ConwayRange {
     }
 }
 
-fn parse_line(line: &str) -> (i32, i32, i32, i32, i32, i32) {
+fn parse_line(line: &str) -> (i64, i64, i64, i64, i64, i64) {
     let xyz_match =
         Regex::new(r"x=(-?\d+)..(-?\d+),y=(-?\d+)..(-?\d+),z=(-?\d+)..(-?\d+)").unwrap();
 
     if let Some(cap) = xyz_match.captures(line) {
         let (x_min, x_max, y_min, y_max, z_min, z_max) = (
-            cap[1].parse::<i32>().unwrap(),
-            cap[2].parse::<i32>().unwrap(),
-            cap[3].parse::<i32>().unwrap(),
-            cap[4].parse::<i32>().unwrap(),
-            cap[5].parse::<i32>().unwrap(),
-            cap[6].parse::<i32>().unwrap(),
+            cap[1].parse::<i64>().unwrap(),
+            cap[2].parse::<i64>().unwrap(),
+            cap[3].parse::<i64>().unwrap(),
+            cap[4].parse::<i64>().unwrap(),
+            cap[5].parse::<i64>().unwrap(),
+            cap[6].parse::<i64>().unwrap(),
         );
 
         return (x_min, x_max, y_min, y_max, z_min, z_max);
@@ -131,7 +138,7 @@ fn parse_line(line: &str) -> (i32, i32, i32, i32, i32, i32) {
 }
 
 fn part_one(input: &str) -> usize {
-    let mut conway_map: HashSet<(i32, i32, i32)> = HashSet::new();
+    let mut conway_map: HashSet<(i64, i64, i64)> = HashSet::new();
     for line in input.lines() {
         let on = line.contains("on");
         let (x_min, x_max, y_min, y_max, z_min, z_max) = parse_line(line);
@@ -155,50 +162,26 @@ fn part_one(input: &str) -> usize {
     conway_map.len()
 }
 
-fn part_two(input: &str) -> usize {
-    let mut conway_map: HashSet<ConwayRange> = HashSet::new();
+fn part_two(input: &str) -> i64 {
+    let mut conway_map: Vec<ConwayRange> = Vec::new(); // all should be on
     for line in input.lines() {
-        let mut next_conway_map: HashSet<ConwayRange> = conway_map.clone();
+        let mut next_conway_map: Vec<ConwayRange> = Vec::new();
         let on = line.contains("on");
-        let new_range = ConwayRange::from_big_tuple(parse_line(line));
+        let new_range = ConwayRange::from_big_tuple(on, parse_line(line));
 
-        if !new_range.in_range(-50, 50) {
-            break;
+        if new_range.is_on() {
+            next_conway_map.push(new_range);
         }
 
-        if on && conway_map.len() == 0 {
-            conway_map.insert(new_range);
-            continue;
-        }
-
-        let mut intersects_a_range = false;
         for range in conway_map {
             if range.intersects(&new_range) {
-                intersects_a_range = true;
-                if on {
-                    // keep everything
-                    next_conway_map.extend(new_range.subtract(&range));
-                } else {
-                    next_conway_map.extend(range.subtract(&new_range));
-                    next_conway_map.remove(&range);
-                }
+                next_conway_map.extend(range.subtract(&new_range));
+            } else {
+                next_conway_map.push(range);
             }
         }
-        if !intersects_a_range {
-            next_conway_map.insert(new_range);
-        }
-        conway_map = next_conway_map;
+
+        conway_map = next_conway_map.clone();
     }
-    let count = conway_map.len();
-    println!("finished! map has {} elements", count);
-    println!(
-        "guessed size is {}",
-        conway_map.iter().fold(0, |a, c| a + c.len())
-    );
-    0
-    // println!("{:?}", points);
-    // conway_map.iter().fold(0, |acc, cur| acc + cur.len())
-    // 6616803199286 (too low)
-    // 21350373047342664 (too high)
-    // 25138526634640680 (too high)
+    conway_map.iter().fold(0, |a, c| a + c.len())
 }
