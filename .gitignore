@@ -1,7 +1,7 @@
 __pycache__
 .vscode
 inputs
-
+.DS_Store
 advent-of-rust/target
 advent-of-rust/input/*
 # keep test input files
