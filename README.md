@@ -19,9 +19,42 @@ not enough values to unpack (expected 4, got 0)
 Usage: $ python apply_template.py language year day detail
 ```
 
+## Specific instructions for languages
+
+### Python
+
+```sh
+$ python /path/to/day_file.py
+# output logged below
+```
+
+### Rust
+
+> Disclaimer: When writing this code, I was rather unfamiliar with the Rust language.
+> I probably still am unfamiliar with the language.
+
+I tried to keep the setup fairly clean,
+and have made a super inelegant CLI to help this effort.
+
+```sh
+$ cargo run <year> <day>
+part one: test
+
+part two: test
+
+```
+
+### Nim
+
+```sh
+$ nimble run day_file
+# output logged below
+```
+
 ## Languages Used
 
 |year|language|
 |---|---|
 |2020|python|
 |2021|rust|
+|2022|nim|
