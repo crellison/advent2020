@@ -2,7 +2,7 @@ use crate::utils::{get_input, InputType};
 use std::{cmp::Reverse, fmt, io, iter::Rev, ops::Index};
 
 pub fn main() -> io::Result<()> {
-    test();
+    // test();
     println!(
         "part one: {}",
         part_one()
@@ -294,13 +294,6 @@ impl AmphipodHallway {
             }
         }
 
-        // println!("Possible choices");
-        // for h in &possible_hallways {
-        //     println!();
-        //     h.print_board();
-        //     println!();
-        // }
-
         possible_hallways.iter().map(|hallway| hallway.find_min_score()).min().unwrap_or(0)
     }
 }
@@ -328,8 +321,8 @@ fn part_one() -> usize {
         [Amphipod::BRONZE, Amphipod::DESERT],
         [Amphipod::AMBER, Amphipod::AMBER],
     );
+    game.print_board();
     game.find_min_score()
-    // 0
 }
 
 fn part_two(input: &str) -> &str {
