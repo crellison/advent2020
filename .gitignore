@@ -6,3 +6,7 @@ target
 input/*
 # keep test input files
 !input/0
+
+nimcache/
+*.swp
+nim_bin_2022
