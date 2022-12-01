@@ -14,7 +14,9 @@ proc main() =
   for part in [partOne, partTwo]:
     try:
       part(input)
-    except Exception:
+    except Exception as exc:
+      echo "bailing from exception"
+      echo exc.msg
       exitCode = QuitFailure
   quit(exitCode)
 

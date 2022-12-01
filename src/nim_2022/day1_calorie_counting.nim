@@ -1,28 +1,21 @@
-import system/io, strutils, math
+import system/io, strutils, math, sequtils
 
 proc partOne*(input: string) =
-  var largest: int = 0
-  var current: int = 0
-  for line in input.split("\n"):
-    if line == "":
-      largest = max(largest, current)
-      current = 0
-    else:
-      current += parseInt(line)
+  var largest = 0
+  for elf in input.split("\n\n"):
+    let filteredFood = filter(elf.split("\n"), proc(x: string): bool = x != "")
+    let elfFood = sum(filteredFood.map(parseInt))
+    if elfFood > largest:
+      largest = elfFood
   echo largest
 
 proc partTwo*(input: string) =
   var largest: array[3, int] = [0,0,0]
-  var current: int = 0
-  for line in input.split("\n"):
-    if line == "":
-      let newMin = max(min(largest), current)
-      if find(largest, newMin) == -1:
-        let changeIndex = find(largest, min(largest))
-        largest[changeIndex] = newMin
-      current = 0
-    else:
-      current += parseInt(line)
+  for elf in input.split("\n\n"):
+    let filteredFood = filter(elf.split("\n"), proc(x: string): bool = x != "")
+    let elfFood = sum(filteredFood.map(parseInt))
+    let minIndex = find(largest, min(largest))
+    largest[minIndex] = max(largest[minIndex], elfFood)
   echo sum(largest)
 
 proc main() =
