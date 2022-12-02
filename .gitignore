@@ -9,4 +9,4 @@ input/*
 
 nimcache/
 *.swp
-nim_bin_2022
+nim_bin
