@@ -14,17 +14,18 @@ Options:
   --version     Show version.
 """
 
-import system/io, strformat, docopt
+import system/io, strformat, docopt, strutils
 import nim_2022/day1_calorie_counting, nim_2022/day2_rock_paper_scissors
 
 proc main() =
-  let args = docopt(doc, version="Advent of Nim 0.0.1")
+  let args = docopt(doc, version = "Advent of Nim 0.0.1")
   let
     year = $args["<year>"]
     day = $args["<day>"]
     inputId = $args["<inputId>"]
-  
-  let input = readFile(&"./input/{year}/{day}-{inputId}.txt")
+
+  var input = readFile(&"./input/{year}/{day}-{inputId}.txt")
+  input.removeSuffix("\n")
   case year:
     of "2022":
       case day:

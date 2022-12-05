@@ -9,7 +9,7 @@ proc partOne*(input: string): int =
       result = elfFood
 
 proc partTwo*(input: string): int =
-  var largest: array[3, int] = [0,0,0]
+  var largest: array[3, int] = [0, 0, 0]
   for elf in input.split("\n\n"):
     let filteredFood = filter(elf.split("\n"), proc(x: string): bool = x != "")
     let elfFood = sum(filteredFood.map(parseInt))

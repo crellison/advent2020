@@ -5,8 +5,6 @@ import strutils
 
 proc partOne*(input: string): int =
   for line in input.split("\n"):
-    if line == "":
-      continue
     let opponentThrow = int(char(line[0]))
     let yourThrow = int(char(line[2]))
     result += yourThrow - 87
@@ -14,8 +12,6 @@ proc partOne*(input: string): int =
 
 proc partTwo*(input: string): int =
   for line in input.split("\n"):
-    if line == "":
-      continue
     let opponentThrow = int(char(line[0]))
     let intendedOutcome = int(char(line[2]))
     result += (intendedOutcome - 88) * 3
