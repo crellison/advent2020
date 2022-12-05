@@ -1,9 +1,5 @@
-import strformat
-
 # Returns an iterable that steps through an interable in chunkSize sequences
-iterator chunked*[T](range: openArray[T], chunkSize: int = 1): seq[T] =
-  if chunkSize < 1:
-    raise newException(RangeDefect, &"expected range greater than 1. received: {chunkSize}")
+iterator chunked*[T](range: openArray[T], chunkSize: Positive = 1): seq[T] =
   var i = 0
   while i < range.len():
     var nextSeq: seq[T]
