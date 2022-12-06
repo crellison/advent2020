@@ -16,7 +16,8 @@ Options:
 
 import system/io, strformat, docopt, strutils
 import nim_2022/day1_calorie_counting, nim_2022/day2_rock_paper_scissors,
-    nim_2022/day3_rucksack, nim_2022/day4_cleanup, nim_2022/day5_stacks
+    nim_2022/day3_rucksack, nim_2022/day4_cleanup, nim_2022/day5_stacks,
+    nim_2022/day6_tuning
 
 proc main() =
   let args = docopt(doc, version = "Advent of Nim 0.0.1")
@@ -45,6 +46,9 @@ proc main() =
         of "5":
           echo day5_stacks.partOne(input)
           echo day5_stacks.partTwo(input)
+        of "6":
+          echo day6_tuning.partOne(input)
+          echo day6_tuning.partTwo(input)
         else:
           echo &"solution not available for {year}-{day}"
     else:
