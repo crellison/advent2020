@@ -1,4 +1,4 @@
-import tables, strutils, re, sequtils, strformat
+import tables, strutils, re, sequtils
 
 type
   PositionType = enum
