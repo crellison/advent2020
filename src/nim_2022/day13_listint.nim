@@ -1,4 +1,6 @@
-import strutils, sequtils, strformat, algorithm
+import strutils, sequtils, strformat, algorithm, logging
+
+var logger = newConsoleLogger()
 
 type Ordered = enum
   yes, no, unknown
@@ -50,45 +52,41 @@ proc buildSeq(tokens: string): SeqOrInt =
           continue
 
 proc intOrdered(left: int, right: int): Ordered =
-  # echo &"INT COMPARE: {left} < {right}"
+  logger.log(lvlDebug, &"INT COMPARE: {left} < {right}")
   result = case right - left:
     of 1..high(int):
+      logger.log(lvlDebug, "left side is smaller, so we are good")
       Ordered.yes
     of low(int).. -1:
+      logger.log(lvlDebug, "right side is smaller, so we are bad")
       Ordered.no
     else:
+      logger.log(lvlDebug, "who knows, let's keep going")
       Ordered.unknown 
 
 # only pass in lines of the form [<tokens>]
 proc seqOrIntCmp(left, right: SeqOrInt): Ordered =
-  # echo &"comparing {left} {left.t} to {right} {right.t}"
-  
+  result = Ordered.unknown
+  logger.log(lvlDebug, &"compare {left} to {right}")
   if left.t == PacketType.INT and right.t == PacketType.INT:
     result = intOrdered(left.i, right.i)
-  # convert non seq to seq
   elif right.t == PacketType.INT:
-    if left.s.len() == 0:
-      result = Ordered.yes
-    else:
-      result = seqOrIntCmp(left, buildSeq(&"[{right}]"))
-      # result = if intOrdered(left.s[0].i, right.i) == Ordered.yes: Ordered.yes else: Ordered.no
+    result = seqOrIntCmp(left, buildSeq(&"[{right}]"))
   elif left.t == PacketType.INT:
-    if right.s.len() == 0:
-      result = Ordered.no
-    else:
-      result = seqOrIntCmp(buildSeq(&"[{left}]"), right)
-      # result = if intOrdered(left.i, right.s[0].i) == Ordered.no: Ordered.no else: Ordered.yes
+    result = seqOrIntCmp(buildSeq(&"[{left}]"), right)
   else:
-    result = Ordered.unknown
-    var cursor = 0
-    while cursor <= left.s.high and result == Ordered.unknown:
-      if right.s.high < cursor:
-        result = Ordered.no
-        break
-      result = seqOrIntCmp(left.s[cursor], right.s[cursor])
-      inc(cursor)
-    if result == Ordered.unknown:
-      result = Ordered.yes
+    block findOrdering:
+      for i in 0..min(left.s.high(), right.s.high()):
+        result = seqOrIntCmp(left.s[i], right.s[i])
+        if result != Ordered.unknown:
+          break findOrdering
+    if result == Ordered.unknown and left.s.high() != right.s.high():
+      result = if left.s.high() > right.s.high():
+        logger.log(lvlDebug, "left is longer, so it's a no")
+        Ordered.no
+      else:
+        logger.log(lvlDebug, "right is longer, so we are good!")
+        Ordered.yes
 
 proc `<`(a,b: SeqOrInt): bool =
   result = if seqOrIntCmp(a,b) == Ordered.yes: true else: false

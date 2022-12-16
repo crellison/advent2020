@@ -2,7 +2,7 @@ let doc = """
 Advent of Nim
 
 Usage:
-  advent <year> <day> <inputId>
+  advent <year> <day> <inputId> [--debug]
 
 Types:
   year        int (only 2022 currently)
@@ -14,10 +14,11 @@ Options:
   --version     Show version.
 """
 
-import system/io, strformat, docopt, strutils
+import system/io, strformat, docopt, strutils, logging
 import nim_2022/[
   day1_calorie_counting, day2_rock_paper_scissors, day3_rucksack, day4_cleanup, day5_stacks,
-  day6_tuning, day7_terminal, day8_treehouse, day9_ropes, day10_signal, day13_listint, day15_beacon]
+  day6_tuning, day7_terminal, day8_treehouse, day9_ropes, day10_signal, day13_listint, day15_beacon,
+  day16_pressure]
 
 proc main() =
   let args = docopt(doc, version = "Advent of Nim 0.0.1")
@@ -25,7 +26,9 @@ proc main() =
     year = $args["<year>"]
     day = $args["<day>"]
     inputId = $args["<inputId>"]
+    debug = parseBool($args["--debug"])
 
+  setLogFilter(if debug: lvlDebug else: lvlError)
   var input = readFile(&"./input/{year}/{day}-{inputId}.txt")
   input.removeSuffix("\n")
   case year:
@@ -67,6 +70,9 @@ proc main() =
         of "15":
           echo day15_beacon.partOne(input)
           echo day15_beacon.partTwo(input)
+        of "16":
+          echo day16_pressure.partOne(input)
+          echo day16_pressure.partTwo(input)
         else:
           echo &"solution not available for {year}-{day}"
     else:
