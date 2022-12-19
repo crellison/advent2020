@@ -1,4 +1,6 @@
-import tables, strutils, re, sequtils
+import tables, strutils, re, sequtils, logging
+
+var logger = newConsoleLogger()
 
 type
   PositionType = enum
@@ -63,6 +65,7 @@ proc partOne*(input: string): int =
     let numbers = line.findAll(re"(\-?\d+)").map(parseInt)
     beaconMap.addToMap((numbers[0], numbers[1]), (numbers[2], numbers[3]))
   
+  logging.log(lvlDebug, beaconMap)
   let rowToCheck = 2000000 # 10
 
   for x in beaconMap.xMin..beaconMap.xMax:
