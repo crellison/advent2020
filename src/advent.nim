@@ -18,7 +18,7 @@ import system/io, strformat, docopt, strutils, logging
 import nim_2022/[
   day1_calorie_counting, day2_rock_paper_scissors, day3_rucksack, day4_cleanup, day5_stacks,
   day6_tuning, day7_terminal, day8_treehouse, day9_ropes, day10_signal, day13_listint, day15_beacon,
-  day16_pressure]
+  day16_pressure, day17_rocks, day18_faces]
 
 proc main() =
   let args = docopt(doc, version = "Advent of Nim 0.0.1")
@@ -73,6 +73,12 @@ proc main() =
         of "16":
           echo day16_pressure.partOne(input)
           echo day16_pressure.partTwo(input)
+        of "17":
+          echo day17_rocks.partOne(input)
+          echo day17_rocks.partTwo(input)
+        of "18":
+          echo day18_faces.partOne(input)
+          echo day18_faces.partTwo(input)
         else:
           echo &"solution not available for {year}-{day}"
     else:
