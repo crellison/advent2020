@@ -58,3 +58,4 @@ $ nimble run day_file
 |2020|python|
 |2021|rust|
 |2022|nim|
+|2023|node|

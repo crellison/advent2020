@@ -1,0 +1,10 @@
+{
+  "name": "adventofcode-ellison",
+  "version": "1.0.0",
+  "description": "AoC Solutions in Node",
+  "scripts": {
+    "start": "node src/advent.mjs"
+  },
+  "author": "@crellison",
+  "license": "ISC"
+}
