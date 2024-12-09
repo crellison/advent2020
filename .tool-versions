@@ -1,3 +1,4 @@
-python 3.9.0
+python 3.9.6
 nim 1.6.10
 rust 1.65.0
+nodejs 22.12.0
