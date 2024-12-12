@@ -140,3 +140,4 @@ if __name__ == "__main__":
     print(f"Part 2: {part_two(start, obstacles)}")
     # 900, 901 too low
     # 1578 too high
+    # 1577 too high
