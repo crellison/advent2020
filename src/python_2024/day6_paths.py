@@ -76,57 +76,40 @@ def part_one(start: Tuple[int, int], obstacles: defaultdict) -> int:
             or next_obstacle[1] == max(obstacles[-1].keys())
         ):
             break
-    return len(visited)
+    return len(visited), visited
 
 
-def part_two(start: Tuple[int, int], obstacles: defaultdict) -> int:
-    possible_obstacles = [
-        (i, j)
-        for i in range(min(obstacles.keys()) + 1, max(obstacles.keys()))
-        for j in range(min(obstacles[i].keys()) + 1, max(obstacles[i].keys()))
-        if j not in obstacles[i] and (i, j) != start
-    ]
+def part_two(
+    start: Tuple[int, int], obstacles: defaultdict, obstacle_locations: set
+) -> int:
     valid_obstacle_count = 0
+    i_range = range(max(obstacles.keys()))
+    j_range = range(max(obstacles[0].keys()))
 
-    def check_for_loop(obstacles):
-        visited = set()
-        visited.add(start)
+    def check_for_loop(obstacles, new_obstacle):
+        moves = set()
         dir_index = 0
         pos = start
-        possible_loop = False
         for i in range(1, 1000):  # no infinite loops
             next_obstacle, next_pos = get_next_pos(
                 pos, obstacles, directions[dir_index]
             )
-            distance_from_current = abs(next_obstacle[0] - pos[0]) + abs(
-                next_obstacle[1] - pos[1]
-            )
-            if next_pos in visited and distance_from_current > 1:
-                if not possible_loop:
-                    # need to validate that the step after next is in visited
-                    possible_loop = True
-                else:
-                    # print(f"loop found after step {i} with next position {next_pos}")
-                    return True
+            next_move = f"{pos}|{next_pos}"
+            if next_move in moves and next_obstacle == new_obstacle:
+                return True
+            moves.add(next_move)
 
             # print(f"pos: {pos}, next_pos: {next_pos}, next_obstacle: {next_obstacle}")
-            di, dj = directions[dir_index]
             dir_index = (dir_index + 1) % 4
-
-            for i in range(distance_from_current):
-                visited.add((pos[0] + di * i, pos[1] + dj * i))
             pos = next_pos
-            if (
-                next_obstacle[0] == min(obstacles.keys())
-                or next_obstacle[0] == max(obstacles.keys())
-                or next_obstacle[1] == min(obstacles[-1].keys())
-                or next_obstacle[1] == max(obstacles[-1].keys())
-            ):
+            if next_obstacle[0] not in i_range or next_obstacle[1] not in j_range:
                 return False
 
-    for i, j in possible_obstacles:
+    for i, j in obstacle_locations:
+        if (i, j) == start:
+            continue
         obstacles[i][j] = True
-        if check_for_loop(obstacles):
+        if check_for_loop(obstacles, (i, j)):
             # print(f"loop found with obstacle at {i}, {j}")
             valid_obstacle_count += 1
         del obstacles[i][j]
@@ -136,8 +119,11 @@ def part_two(start: Tuple[int, int], obstacles: defaultdict) -> int:
 
 if __name__ == "__main__":
     start, obstacles = get_input()
-    print(f"Part 1: {part_one(start, obstacles)}")
-    print(f"Part 2: {part_two(start, obstacles)}")
+    part_one_result, visited = part_one(start, obstacles)
+    print(f"Part 1: {part_one_result}")
+    print(f"Part 2: {part_two(start, obstacles, visited)}")
     # 900, 901 too low
     # 1578 too high
     # 1577 too high
+    # 1504 - wrong
+    # 1400 - wrong
