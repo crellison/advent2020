@@ -2,6 +2,7 @@ from copy import deepcopy
 from collections import defaultdict
 from os.path import abspath, dirname
 from typing import List, Tuple, Dict, Set
+import time
 
 INPUT_FILE = abspath(dirname(abspath(__file__)) + "/../../input/2024/15-1.txt")
 
@@ -130,6 +131,7 @@ def part_two(map: List, instructions: str, start_loc: Tuple[int, int]) -> int:
     current_loc = start_loc
 
     for i, instruction in enumerate(instructions):
+        # start_time = time.time()
         if instruction not in char_to_direction:
             continue
         positions_to_move = get_positions_to_move(current_loc, instruction)
@@ -163,7 +165,10 @@ def part_two(map: List, instructions: str, start_loc: Tuple[int, int]) -> int:
         #     print(f"Positions to move: {positions_to_move}")
         for loc, val in map_changes.items():
             map[loc] = val
-        print_map(map)
+
+        # delta_for_frame = 1 / 24 - (time.time() - start_time)
+        # time.sleep(delta_for_frame)
+        # print_map(map)
     print_map(map)
     return sum(i * 100 + j for i, j in map.keys() if map[(i, j)] in "[")
 
