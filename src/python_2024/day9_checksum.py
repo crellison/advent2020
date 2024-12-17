@@ -4,7 +4,7 @@ from os.path import abspath, dirname
 from typing import List
 import heapq
 
-INPUT_FILE = abspath(dirname(abspath(__file__)) + "/../../input/2024/9-1.txt")
+INPUT_FILE = abspath(dirname(abspath(__file__)) + "/../../input/2024/9-test.txt")
 
 
 def get_input() -> str:

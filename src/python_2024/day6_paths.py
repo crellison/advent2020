@@ -94,8 +94,8 @@ def part_two(
             next_obstacle, next_pos = get_next_pos(
                 pos, obstacles, directions[dir_index]
             )
-            next_move = f"{pos}|{next_pos}"
-            if next_move in moves and next_obstacle == new_obstacle:
+            next_move = f"{pos}|{next_pos}|{next_obstacle}"
+            if next_move in moves:
                 return True
             moves.add(next_move)
 
@@ -105,6 +105,7 @@ def part_two(
             if next_obstacle[0] not in i_range or next_obstacle[1] not in j_range:
                 return False
 
+    new_obstacles = set()
     for i, j in obstacle_locations:
         if (i, j) == start:
             continue
@@ -112,6 +113,7 @@ def part_two(
         if check_for_loop(obstacles, (i, j)):
             # print(f"loop found with obstacle at {i}, {j}")
             valid_obstacle_count += 1
+            new_obstacles.add((i, j))
         del obstacles[i][j]
 
     return valid_obstacle_count
@@ -122,8 +124,3 @@ if __name__ == "__main__":
     part_one_result, visited = part_one(start, obstacles)
     print(f"Part 1: {part_one_result}")
     print(f"Part 2: {part_two(start, obstacles, visited)}")
-    # 900, 901 too low
-    # 1578 too high
-    # 1577 too high
-    # 1504 - wrong
-    # 1400 - wrong
