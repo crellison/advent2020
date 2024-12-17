@@ -137,7 +137,7 @@ def part_two(map: List, instructions: str, start_loc: Tuple[int, int]) -> int:
         if len(positions_to_move) == 0:
             continue
 
-        new_map = deepcopy(map)
+        map_changes = defaultdict(lambda: "#")
         di, dj = char_to_direction[instruction]
 
         # for i, j in positions_to_move:
@@ -151,9 +151,9 @@ def part_two(map: List, instructions: str, start_loc: Tuple[int, int]) -> int:
         #         return -1
 
         for i, j in positions_to_move:
-            new_map[(i, j)] = "."
+            map_changes[(i, j)] = "."
         for i, j in positions_to_move:
-            new_map[(i + di, j + dj)] = map[(i, j)]
+            map_changes[(i + di, j + dj)] = map[(i, j)]
         if len(positions_to_move) != 0:
             current_loc = (current_loc[0] + di, current_loc[1] + dj)
         # if instruction in "^v" and len(positions_to_move) > 1:
@@ -161,8 +161,9 @@ def part_two(map: List, instructions: str, start_loc: Tuple[int, int]) -> int:
         #     print(f"Move: {instruction}")
         #     print_map(map)
         #     print(f"Positions to move: {positions_to_move}")
-        # print_map(new_map)
-        map = new_map
+        for loc, val in map_changes.items():
+            map[loc] = val
+        print_map(map)
     print_map(map)
     return sum(i * 100 + j for i, j in map.keys() if map[(i, j)] in "[")
 
