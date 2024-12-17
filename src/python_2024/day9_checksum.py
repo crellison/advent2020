@@ -4,7 +4,7 @@ from os.path import abspath, dirname
 from typing import List
 import heapq
 
-INPUT_FILE = abspath(dirname(abspath(__file__)) + "/../../input/2024/9-test.txt")
+INPUT_FILE = abspath(dirname(abspath(__file__)) + "/../../input/2024/9-1.txt")
 
 
 def get_input() -> str:
@@ -70,10 +70,11 @@ def part_two(input: str) -> int:
     block_position = 0
     for i, num in enumerate(input):
         block_len = int(num)
-        if i % 2 == 0:
-            files.append((i // 2, block_position, block_len))
-        else:
-            heapq.heappush(empty_blocks[block_len], block_position)
+        if block_len != 0:
+            if i % 2 == 0:
+                files.append((i // 2, block_position, block_len))
+            else:
+                heapq.heappush(empty_blocks[block_len], block_position)
         block_position += block_len
 
     for i in range(len(files) - 1, -1, -1):
@@ -85,6 +86,7 @@ def part_two(input: str) -> int:
                 if x >= file_len and len(empty_blocks[x]) > 0
             ),
             default=-1,
+            key=lambda x: empty_blocks[x][0],
         )
         if relocation_slot_size == -1:
             continue
@@ -110,5 +112,3 @@ if __name__ == "__main__":
     input = get_input()
     print(f"Part 1: {part_one(input)}")
     print(f"Part 2: {part_two(input)}")
-    # 6254536635297 too low
-    # 8449596564468 too high
